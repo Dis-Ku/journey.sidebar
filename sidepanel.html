@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Journey Sidebar</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <div id="toolbar">
+      <button id="homeBtn" title="ホーム（設定したURLへ戻る）">🏠</button>
+      <button id="reloadBtn" title="再読み込み">⟳</button>
+      <span class="spacer"></span>
+      <button id="openTabBtn" title="新しいタブで開く">↗ 新しいタブ</button>
+      <button id="settingsBtn" title="設定">⚙</button>
+    </div>
+    <div id="frameWrap">
+      <iframe
+        id="frame"
+        src="about:blank"
+        allow="clipboard-write; fullscreen; camera; microphone"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+    </div>
+    <div id="fallback">
+      <p>
+        パネル内でうまく表示されない場合は、下のボタンから新しいタブで開いてください。
+      </p>
+      <button id="fallbackOpenTab">新しいタブで開く</button>
+      <button id="fallbackSettings">表示するURLを変更</button>
+    </div>
+    <script src="common.js"></script>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

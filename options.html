@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>Journey Sidebar の設定</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Journey Sidebar の設定</h1>
+
+      <label for="urlInput">サイドパネルに表示するURL</label>
+      <input
+        id="urlInput"
+        type="url"
+        placeholder="https://journey.cloud/webapp/#/login"
+        autocomplete="off"
+      />
+      <p class="hint">
+        通常は初期値（Journey Web App のログインページ）のままで構いません。
+        Journey側のURL変更などで表示できない場合や、他の言語/地域のURLを使いたい場合にここを変更してください。
+      </p>
+
+      <div class="actions">
+        <button id="saveBtn">保存</button>
+        <button id="resetBtn" class="secondary">初期値に戻す</button>
+      </div>
+      <p id="status" role="status"></p>
+
+      <hr />
+
+      <h2>このURL専用ドメイン以外を開く場合について</h2>
+      <p class="hint">
+        journey.cloud 以外のドメインを設定すると、そのサイトをパネル内に埋め込むための追加の権限（該当サイトへのアクセス許可）を
+        ブラウザからリクエストします。許可すると、そのドメインからの応答に含まれる
+        <code>X-Frame-Options</code> / <code>Content-Security-Policy</code> ヘッダーを、
+        このパネルに埋め込む目的でのみ取り除きます（あなた自身のブラウザ内のみで完結し、外部に送信されるデータはありません）。
+      </p>
+    </main>
+    <script src="common.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>
