@@ -9,16 +9,16 @@
     <main>
       <h1>Journey Sidebar の設定</h1>
 
-      <label for="urlInput">サイドパネルに表示するURL</label>
+      <label for="urlInput">サイドバーウィンドウで開くURL</label>
       <input
         id="urlInput"
         type="url"
-        placeholder="https://journey.cloud/webapp/#/login"
+        placeholder="https://journey.cloud/app/timeline"
         autocomplete="off"
       />
       <p class="hint">
-        通常は初期値（Journey Web App のログインページ）のままで構いません。
-        Journey側のURL変更などで表示できない場合や、他の言語/地域のURLを使いたい場合にここを変更してください。
+        既定値は Journey Web App のタイムラインページです。ログインページから始めたい場合や、
+        別の言語/地域のURLを使いたい場合はここを変更してください。
       </p>
 
       <div class="actions">
@@ -29,12 +29,14 @@
 
       <hr />
 
-      <h2>このURL専用ドメイン以外を開く場合について</h2>
+      <h2>なぜ「サイドパネル」ではなく別ウィンドウなのか</h2>
       <p class="hint">
-        journey.cloud 以外のドメインを設定すると、そのサイトをパネル内に埋め込むための追加の権限（該当サイトへのアクセス許可）を
-        ブラウザからリクエストします。許可すると、そのドメインからの応答に含まれる
-        <code>X-Frame-Options</code> / <code>Content-Security-Policy</code> ヘッダーを、
-        このパネルに埋め込む目的でのみ取り除きます（あなた自身のブラウザ内のみで完結し、外部に送信されるデータはありません）。
+        Journey は自身が iframe（他ページへの埋め込み）内で表示されていることを検知すると、
+        「clickjacked の可能性があります」という警告を表示し、編集機能を無効化します。
+        そのため、ブラウザのサイドパネルに直接埋め込む方式は使えません。
+        この拡張機能では代わりに、通常のブラウザウィンドウとして Journey を開き、
+        画面の右端にドッキングさせることでサイドバーのように使えるようにしています。
+        通常のウィンドウとして開くため、Journey側の機能はすべて問題なく利用できます。
       </p>
     </main>
     <script src="common.js"></script>

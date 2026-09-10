@@ -1,70 +1,90 @@
 importScripts("common.js");
 
-// Clicking the toolbar icon opens the side panel directly.
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch((err) => {
-    console.error("Journey Sidebar: failed to set panel behavior", err);
-  });
-  syncDynamicRuleForCurrentUrl();
-});
+const WINDOW_WIDTH = 420;
 
-chrome.runtime.onStartup.addListener(() => {
-  syncDynamicRuleForCurrentUrl();
-});
-
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "sync" && changes[STORAGE_KEY]) {
-    syncDynamicRuleForUrl(changes[STORAGE_KEY].newValue || DEFAULT_JOURNEY_URL);
-  }
-});
-
-async function syncDynamicRuleForCurrentUrl() {
-  const url = await getStoredUrl();
-  await syncDynamicRuleForUrl(url);
+async function getJourneyWindowId() {
+  const data = await chrome.storage.session.get(WINDOW_ID_KEY);
+  return typeof data[WINDOW_ID_KEY] === "number" ? data[WINDOW_ID_KEY] : null;
 }
 
-// The static rules.json ruleset already strips framing headers for
-// journey.cloud. If the user points the panel at a different domain in the
-// options page, add a matching dynamic rule (only possible once the
-// necessary host permission has been granted for that origin).
-async function syncDynamicRuleForUrl(urlString) {
-  let hostname;
+async function setJourneyWindowId(id) {
+  if (id === null) {
+    await chrome.storage.session.remove(WINDOW_ID_KEY);
+  } else {
+    await chrome.storage.session.set({ [WINDOW_ID_KEY]: id });
+  }
+}
+
+// Dock the popup window to the right edge of the primary display, spanning
+// its full working height, so it behaves like a pinned sidebar.
+async function getDockedBounds() {
   try {
-    hostname = new URL(urlString).hostname;
+    const displays = await chrome.system.display.getInfo();
+    const primary = displays.find((d) => d.isPrimary) || displays[0];
+    const wa = primary.workArea;
+    return {
+      left: wa.left + wa.width - WINDOW_WIDTH,
+      top: wa.top,
+      width: WINDOW_WIDTH,
+      height: wa.height,
+    };
   } catch (err) {
+    console.error("Journey Sidebar: failed to read display info", err);
+    return { width: WINDOW_WIDTH, height: 900 };
+  }
+}
+
+async function openJourneyWindow() {
+  const url = await getStoredUrl();
+  const bounds = await getDockedBounds();
+  const win = await chrome.windows.create({
+    url,
+    type: "popup",
+    ...bounds,
+  });
+  await setJourneyWindowId(win.id);
+}
+
+// Clicking the toolbar icon toggles the docked window: open it if closed,
+// close it if already open.
+async function toggleJourneyWindow() {
+  const existingId = await getJourneyWindowId();
+  if (existingId !== null) {
+    try {
+      await chrome.windows.get(existingId);
+      await chrome.windows.remove(existingId);
+    } catch (err) {
+      // Window was already closed some other way; nothing to remove.
+    }
+    await setJourneyWindowId(null);
     return;
   }
-
-  const removeRuleIds = [DYNAMIC_RULE_ID];
-  const addRules = [];
-
-  if (!isDefaultDomain(hostname)) {
-    const hasPermission = await chrome.permissions.contains({
-      origins: [`*://${hostname}/*`],
-    });
-    if (hasPermission) {
-      addRules.push({
-        id: DYNAMIC_RULE_ID,
-        priority: 1,
-        action: {
-          type: "modifyHeaders",
-          responseHeaders: [
-            { header: "x-frame-options", operation: "remove" },
-            { header: "content-security-policy", operation: "remove" },
-            { header: "content-security-policy-report-only", operation: "remove" },
-          ],
-        },
-        condition: {
-          requestDomains: [hostname],
-          resourceTypes: ["sub_frame"],
-        },
-      });
-    }
-  }
-
-  try {
-    await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds, addRules });
-  } catch (err) {
-    console.error("Journey Sidebar: failed to update dynamic rules", err);
-  }
+  await openJourneyWindow();
 }
+
+chrome.action.onClicked.addListener(() => {
+  toggleJourneyWindow();
+});
+
+chrome.windows.onRemoved.addListener(async (closedId) => {
+  const currentId = await getJourneyWindowId();
+  if (closedId === currentId) {
+    await setJourneyWindowId(null);
+  }
+});
+
+// If the configured URL changes while the docked window is open, navigate it
+// to the new URL immediately.
+chrome.storage.onChanged.addListener(async (changes, area) => {
+  if (area !== "sync" || !changes[STORAGE_KEY]) return;
+  const windowId = await getJourneyWindowId();
+  if (windowId === null) return;
+  try {
+    const tabs = await chrome.tabs.query({ windowId });
+    if (tabs[0]) {
+      await chrome.tabs.update(tabs[0].id, { url: changes[STORAGE_KEY].newValue || DEFAULT_JOURNEY_URL });
+    }
+  } catch (err) {
+    console.error("Journey Sidebar: failed to navigate open window", err);
+  }
+});

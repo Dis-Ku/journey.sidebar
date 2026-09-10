@@ -26,22 +26,12 @@ saveBtn.addEventListener("click", async () => {
       throw new Error("invalid protocol");
     }
   } catch (err) {
-    showStatus("有効なURLを入力してください（https://... の形式）", true);
+    showStatus("有効なURLを入力してください(https://... の形式)", true);
     return;
   }
 
-  if (!isDefaultDomain(parsed.hostname)) {
-    const granted = await chrome.permissions.request({
-      origins: [`*://${parsed.hostname}/*`],
-    });
-    if (!granted) {
-      showStatus("権限が許可されなかったため保存できませんでした。", true);
-      return;
-    }
-  }
-
   await chrome.storage.sync.set({ [STORAGE_KEY]: parsed.href });
-  showStatus("保存しました。サイドパネルを開き直すと反映されます。", false);
+  showStatus("保存しました。開いている場合は自動的に反映されます。", false);
 });
 
 resetBtn.addEventListener("click", async () => {
