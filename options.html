@@ -9,34 +9,40 @@
     <main>
       <h1>Journey Sidebar の設定</h1>
 
-      <label for="urlInput">サイドバーウィンドウで開くURL</label>
+      <label for="urlInput">Zapier Webhook URL</label>
       <input
         id="urlInput"
         type="url"
-        placeholder="https://journey.cloud/app/timeline"
+        placeholder="https://hooks.zapier.com/hooks/catch/xxxxx/xxxxx/"
         autocomplete="off"
       />
       <p class="hint">
-        既定値は Journey Web App のタイムラインページです。ログインページから始めたい場合や、
-        別の言語/地域のURLを使いたい場合はここを変更してください。
+        Zapierで「Webhooks by Zapier（Catch Hook）」をトリガー、「Journey: Create Journal Entry」を
+        アクションとするZapを作成し、発行されたWebhook URLをここに貼り付けてください。
       </p>
 
       <div class="actions">
         <button id="saveBtn">保存</button>
-        <button id="resetBtn" class="secondary">初期値に戻す</button>
+        <button id="testBtn" class="secondary">テスト送信</button>
       </div>
       <p id="status" role="status"></p>
 
       <hr />
 
-      <h2>なぜ「サイドパネル」ではなく別ウィンドウなのか</h2>
+      <h2>Zap設定の手順（初回のみ）</h2>
+      <ol class="steps">
+        <li>Zapierで新しいZapを作成し、トリガーに「Webhooks by Zapier」→「Catch Hook」を選択する。</li>
+        <li>表示されたWebhook URLをコピーし、上のフィールドに貼り付けて保存する。</li>
+        <li>このページで「テスト送信」を押し、Zapier側の「Test trigger」でデータを受信する。</li>
+        <li>
+          アクションに Journey アプリの「Create Journal Entry」を選び、受信した
+          <code>title</code> / <code>text</code> フィールドを対応する入力欄にマッピングする。
+        </li>
+        <li>Zapを有効化（On）にする。</li>
+      </ol>
       <p class="hint">
-        Journey は自身が iframe（他ページへの埋め込み）内で表示されていることを検知すると、
-        「clickjacked の可能性があります」という警告を表示し、編集機能を無効化します。
-        そのため、ブラウザのサイドパネルに直接埋め込む方式は使えません。
-        この拡張機能では代わりに、通常のブラウザウィンドウとして Journey を開き、
-        画面の右端にドッキングさせることでサイドバーのように使えるようにしています。
-        通常のウィンドウとして開くため、Journey側の機能はすべて問題なく利用できます。
+        送信されるJSONのフィールドは <code>title</code>・<code>text</code>・<code>created_at</code> です。
+        Zap側の「Test trigger」画面で実際の受信データを見ながらマッピングできます。
       </p>
     </main>
     <script src="common.js"></script>

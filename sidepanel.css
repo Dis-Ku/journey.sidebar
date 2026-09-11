@@ -1,0 +1,149 @@
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --toolbar-bg: #f3f2fb;
+  --border: #ddd8f5;
+  --text: #2a2550;
+  --muted: #6b6685;
+  --accent: #4f46e5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17151f;
+    --toolbar-bg: #201c30;
+    --border: #35304a;
+    --text: #eceafc;
+    --muted: #a49cc6;
+    --accent: #8b7dff;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "Segoe UI", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background: var(--toolbar-bg);
+  border-bottom: 1px solid var(--border);
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+#toolbar button {
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#toolbar button:hover {
+  background: rgba(79, 70, 229, 0.14);
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+main {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 10px;
+}
+
+#titleInput {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  background: transparent;
+  color: var(--text);
+}
+
+#bodyInput {
+  flex: 1 1 auto;
+  min-height: 0;
+  resize: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.6;
+  background: transparent;
+  color: var(--text);
+  font-family: inherit;
+}
+
+#titleInput:focus,
+#bodyInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+#actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#draftHint {
+  font-size: 11px;
+  color: var(--muted);
+  flex: 1 1 auto;
+}
+
+#sendBtn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#sendBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+#status {
+  margin: 0;
+  min-height: 1.2em;
+  font-size: 12px;
+}
+
+#status.error {
+  color: #e0455f;
+}
+
+#status.success {
+  color: #2f9e63;
+}

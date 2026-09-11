@@ -1,9 +1,17 @@
-// Shared constants/helpers used by background.js and options.js.
+// Shared constants used by background.js, sidepanel.js and options.js.
 
-const DEFAULT_JOURNEY_URL = "https://journey.cloud/app/timeline";
-const STORAGE_KEY = "journeyUrl";
-const WINDOW_ID_KEY = "journeyWindowId";
+const WEBHOOK_STORAGE_KEY = "zapierWebhookUrl";
+const DRAFT_STORAGE_KEY = "entryDraft";
 
-function getStoredUrl() {
-  return chrome.storage.sync.get(STORAGE_KEY).then((data) => data[STORAGE_KEY] || DEFAULT_JOURNEY_URL);
+function getStoredWebhookUrl() {
+  return chrome.storage.sync.get(WEBHOOK_STORAGE_KEY).then((data) => data[WEBHOOK_STORAGE_KEY] || "");
+}
+
+function isZapierWebhookUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && /(^|\.)zapier\.com$/.test(url.hostname);
+  } catch (err) {
+    return false;
+  }
 }
