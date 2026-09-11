@@ -1,17 +1,16 @@
 // Shared constants used by background.js, sidepanel.js and options.js.
 
-const WEBHOOK_STORAGE_KEY = "zapierWebhookUrl";
+const EMAIL_STORAGE_KEY = "journeyEmail";
 const DRAFT_STORAGE_KEY = "entryDraft";
 
-function getStoredWebhookUrl() {
-  return chrome.storage.sync.get(WEBHOOK_STORAGE_KEY).then((data) => data[WEBHOOK_STORAGE_KEY] || "");
+function getStoredEmail() {
+  return chrome.storage.sync.get(EMAIL_STORAGE_KEY).then((data) => data[EMAIL_STORAGE_KEY] || "");
 }
 
-function isZapierWebhookUrl(value) {
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" && /(^|\.)zapier\.com$/.test(url.hostname);
-  } catch (err) {
-    return false;
-  }
+function isLikelyEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function buildMailtoUrl(email, subject, body) {
+  return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }

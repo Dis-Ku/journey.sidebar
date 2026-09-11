@@ -3,6 +3,7 @@ const settingsBtn = document.getElementById("settingsBtn");
 const titleInput = document.getElementById("titleInput");
 const bodyInput = document.getElementById("bodyInput");
 const sendBtn = document.getElementById("sendBtn");
+const clearBtn = document.getElementById("clearBtn");
 const statusEl = document.getElementById("status");
 
 let draftSaveTimer = null;
@@ -18,65 +19,48 @@ function setStatus(text, kind) {
   statusEl.className = kind || "";
 }
 
-function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
-
-// Journey's Zapier "text" field only understands a small tag set
-// (a, br, hr, h1, i, b, strong, em, blockquote, ul, ol, li) and has no
-// concept of <p>/<div>. This walks the contenteditable DOM and rebuilds it
-// using only what our toolbar can actually produce, turning paragraph
-// breaks into <br>.
-function toJourneyHtml(root) {
-  function walk(node) {
-    if (node.nodeType === Node.TEXT_NODE) {
-      return escapeHtml(node.textContent);
-    }
-    if (node.nodeType !== Node.ELEMENT_NODE) {
-      return "";
-    }
-    const inner = Array.from(node.childNodes).map(walk).join("");
-    switch (node.tagName) {
-      case "B":
-        return `<b>${inner}</b>`;
-      case "STRONG":
-        return `<strong>${inner}</strong>`;
-      case "I":
-        return `<i>${inner}</i>`;
-      case "EM":
-        return `<em>${inner}</em>`;
-      case "UL":
-        return `<ul>${inner}</ul>`;
-      case "OL":
-        return `<ol>${inner}</ol>`;
-      case "LI":
-        return `<li>${inner}</li>`;
-      case "BR":
-        return "<br>";
-      case "P":
-      case "DIV":
-        return `${inner}<br>`;
-      default:
-        return inner;
-    }
+// mailto: bodies are plain text only, so bold/italic/lists are rendered as
+// readable Markdown-style symbols instead of being lost entirely.
+function nodeToPlainText(node) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent;
+  }
+  if (node.nodeType !== Node.ELEMENT_NODE) {
+    return "";
   }
 
-  return Array.from(root.childNodes)
-    .map(walk)
+  const inner = Array.from(node.childNodes).map(nodeToPlainText).join("");
+
+  switch (node.tagName) {
+    case "B":
+    case "STRONG":
+      return inner.trim() ? `**${inner}**` : inner;
+    case "I":
+    case "EM":
+      return inner.trim() ? `*${inner}*` : inner;
+    case "BR":
+      return "\n";
+    case "LI": {
+      const isOrdered = node.parentElement?.tagName === "OL";
+      const prefix = isOrdered ? `${Array.from(node.parentElement.children).indexOf(node) + 1}. ` : "- ";
+      return `${prefix}${inner}\n`;
+    }
+    case "P":
+    case "DIV":
+    case "UL":
+    case "OL":
+      return `${inner}\n`;
+    default:
+      return inner;
+  }
+}
+
+function bodyToPlainText() {
+  return Array.from(bodyInput.childNodes)
+    .map(nodeToPlainText)
     .join("")
-    .replace(/(<br>)+$/i, "");
-}
-
-// Builds the exact string Journey's "text" field expects: plain text when
-// there's no formatting at all, or the whole thing wrapped in <html> when
-// any markup (including a title turned into <h1>) is present.
-function buildJourneyText() {
-  let html = toJourneyHtml(bodyInput);
-  const title = titleInput.value.trim();
-  if (title) {
-    html = `<h1>${escapeHtml(title)}</h1>${html}`;
-  }
-  return html.includes("<") ? `<html>${html}</html>` : html;
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 function scheduleDraftSave() {
@@ -111,16 +95,19 @@ async function sendEntry() {
   }
 
   sendBtn.disabled = true;
-  setStatus("送信中…", "");
+  setStatus("メールソフトを開いています…", "");
 
-  const payload = { text: buildJourneyText() };
-
-  const result = await chrome.runtime.sendMessage({ type: "sendEntry", payload });
+  const result = await chrome.runtime.sendMessage({
+    type: "sendEntry",
+    subject: titleInput.value.trim(),
+    body: bodyToPlainText(),
+  });
 
   sendBtn.disabled = false;
   if (result?.ok) {
-    setStatus("Journeyに送信しました。", "success");
-    await clearDraft();
+    // We can't confirm the mail was actually sent, so the draft is kept
+    // until the user clears it themselves (via "下書きを消去").
+    setStatus("メールソフトを開きました。送信ボタンを押して完了してください。", "success");
   } else {
     setStatus(result?.error || "送信に失敗しました。", "error");
   }
@@ -140,6 +127,11 @@ document.querySelectorAll("#richToolbar button[data-cmd]").forEach((btn) => {
 titleInput.addEventListener("input", scheduleDraftSave);
 bodyInput.addEventListener("input", scheduleDraftSave);
 sendBtn.addEventListener("click", sendEntry);
+clearBtn.addEventListener("click", async () => {
+  await clearDraft();
+  setStatus("", "");
+  titleInput.focus();
+});
 settingsBtn.addEventListener("click", () => chrome.runtime.openOptionsPage());
 
 dateLabel.textContent = formatDate(new Date());

@@ -157,12 +157,6 @@ main {
   gap: 8px;
 }
 
-#draftHint {
-  font-size: 11px;
-  color: var(--muted);
-  flex: 1 1 auto;
-}
-
 #sendBtn {
   padding: 8px 16px;
   border: none;
@@ -176,6 +170,21 @@ main {
 #sendBtn:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+#clearBtn {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#clearBtn:hover {
+  color: var(--text);
+  border-color: var(--accent);
 }
 
 #status {

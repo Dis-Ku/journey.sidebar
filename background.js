@@ -6,39 +6,42 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-async function postToWebhook(payload) {
-  const webhookUrl = await getStoredWebhookUrl();
-  if (!webhookUrl) {
-    return { ok: false, error: "Zapier Webhook URLが設定されていません。設定画面で入力してください。" };
+async function openMailto(subject, body) {
+  const email = await getStoredEmail();
+  if (!email) {
+    return { ok: false, error: "Journeyの投稿用メールアドレスが設定されていません。設定画面で入力してください。" };
   }
-  if (!isZapierWebhookUrl(webhookUrl)) {
-    return { ok: false, error: "設定されているURLがZapierのWebhook URL（https://hooks.zapier.com/...）ではありません。" };
+  if (!isLikelyEmail(email)) {
+    return { ok: false, error: "設定されているメールアドレスの形式が正しくないようです。設定画面を確認してください。" };
   }
 
   try {
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      return { ok: false, error: `送信に失敗しました（HTTP ${res.status}）。` };
-    }
+    const tab = await chrome.tabs.create({ url: buildMailtoUrl(email, subject, body) });
+    // Chrome hands mailto: off to the OS/registered mail app but leaves the
+    // new tab behind at about:blank; clean it up so it doesn't linger.
+    setTimeout(() => {
+      chrome.tabs.get(tab.id).then((t) => {
+        if (t.url === "about:blank" || t.pendingUrl === "about:blank") {
+          chrome.tabs.remove(tab.id).catch(() => {});
+        }
+      }).catch(() => {});
+    }, 1500);
     return { ok: true };
   } catch (err) {
-    return { ok: false, error: `送信中にエラーが発生しました: ${err.message}` };
+    return { ok: false, error: `メールを開けませんでした: ${err.message}` };
   }
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === "sendEntry") {
-    postToWebhook(message.payload).then(sendResponse);
+    openMailto(message.subject, message.body).then(sendResponse);
     return true;
   }
-  if (message?.type === "testWebhook") {
-    postToWebhook({
-      text: "<html><h1>[テスト送信] Journey Sidebar</h1>この投稿は <b>Journey Sidebar</b> 拡張機能の接続テストです。<br><ul><li>Zap側で正しく届いているか確認してください。</li></ul></html>",
-    }).then(sendResponse);
+  if (message?.type === "testEmail") {
+    openMailto(
+      "[テスト送信] Journey Sidebar",
+      "この投稿は Journey Sidebar 拡張機能の接続テストです。\n\nメールソフトが正しいアドレス宛に開けば設定は成功です。"
+    ).then(sendResponse);
     return true;
   }
   return false;

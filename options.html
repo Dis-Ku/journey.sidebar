@@ -9,16 +9,12 @@
     <main>
       <h1>Journey Sidebar の設定</h1>
 
-      <label for="urlInput">Zapier Webhook URL</label>
-      <input
-        id="urlInput"
-        type="url"
-        placeholder="https://hooks.zapier.com/hooks/catch/xxxxx/xxxxx/"
-        autocomplete="off"
-      />
+      <label for="emailInput">Journeyの投稿用メールアドレス</label>
+      <input id="emailInput" type="email" placeholder="xxxxxxxx@journey.cloud" autocomplete="off" />
       <p class="hint">
-        Zapierで「Webhooks by Zapier（Catch Hook）」をトリガー、「Journey: Create Journal Entry」を
-        アクションとするZapを作成し、発行されたWebhook URLをここに貼り付けてください。
+        Journeyアプリの設定画面から、日記に投稿するための専用メールアドレスを確認して
+        貼り付けてください（設定内の「メールで投稿」「Post via Email」など、バージョンによって
+        表記が異なる場合があります。見つからない場合はJourneyのヘルプセンターをご確認ください）。
       </p>
 
       <div class="actions">
@@ -29,25 +25,24 @@
 
       <hr />
 
-      <h2>Zap設定の手順（初回のみ）</h2>
-      <ol class="steps">
-        <li>Zapierで新しいZapを作成し、トリガーに「Webhooks by Zapier」→「Catch Hook」を選択する。</li>
-        <li>表示されたWebhook URLをコピーし、上のフィールドに貼り付けて保存する。</li>
-        <li>このページで「テスト送信」を押し、Zapier側の「Test trigger」でデータを受信する。</li>
-        <li>
-          アクションに Journey アプリの「Create Journal Entry」を選び、受信した
-          <code>text</code> フィールドをJourney側の「テキスト」欄にマッピングする。
-        </li>
-        <li>Zapを有効化（On）にする。</li>
-      </ol>
+      <h2>仕組み</h2>
       <p class="hint">
-        送信されるJSONのフィールドは <code>text</code> のみです（
-        <a href="https://support.journey.cloud/ja/categories/web-services/articles/journey-api-documentation-for-zapier" target="_blank" rel="noopener">Journey公式のZapier用APIドキュメント</a>
-        に準拠）。太字・斜体・箇条書き・番号付きリストを使った場合は、Journeyが対応している
-        タグ（<code>h1, b, strong, i, em, br, ul, ol, li</code>）だけを使い、全体を
-        <code>&lt;html&gt;...&lt;/html&gt;</code> で囲んだ文字列になります。書式を使わなかった
-        場合はそのままのプレーンテキストです。タイトル欄に入力した内容は <code>&lt;h1&gt;</code>
-        として本文の先頭に埋め込まれます（Journeyには独立したタイトル項目がないため）。
+        サイドパネルで「Journeyに送信」を押すと、上記のメールアドレス宛にメールソフト（既定の
+        メールアプリやGmailなど）の作成画面が開きます。件名にはタイトル、本文にはエントリー本文
+        が自動で入力されるので、あとはメールソフト側で送信ボタンを押すだけでJourneyにエントリー
+        が作成されます。
+      </p>
+      <p class="hint">
+        メール本文はプレーンテキストのみ送れるため、太字・斜体・箇条書きは
+        <code>**太字**</code> / <code>*斜体*</code> / <code>- 箇条書き</code>
+        のような読みやすい記号で表現されます（Journey側で装飾として解釈されるとは限りません）。
+      </p>
+
+      <h2>Zapierを試した方へ</h2>
+      <p class="hint">
+        以前はZapierのWebhook経由での送信を試みましたが、Zapierの無料プランでは
+        「Webhooks by Zapier」が有料プラン限定機能になっているため断念し、Journey公式の
+        メール投稿機能を使う方式に変更しました。追加費用や外部サービスの登録は不要です。
       </p>
     </main>
     <script src="common.js"></script>
