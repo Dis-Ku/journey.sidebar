@@ -38,7 +38,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type === "testWebhook") {
     postToWebhook({
       title: "[テスト送信] Journey Sidebar",
-      text: "この投稿は Journey Sidebar 拡張機能の接続テストです。Zap側で正しく届いているか確認してください。",
+      text: "この投稿は **Journey Sidebar** 拡張機能の接続テストです。\n- Zap側で正しく届いているか確認してください。",
+      html: "<p>この投稿は <b>Journey Sidebar</b> 拡張機能の接続テストです。</p><ul><li>Zap側で正しく届いているか確認してください。</li></ul>",
       created_at: new Date().toISOString(),
     }).then(sendResponse);
     return true;

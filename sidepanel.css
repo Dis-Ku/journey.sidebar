@@ -87,10 +87,38 @@ main {
   color: var(--text);
 }
 
+#richToolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+#richToolbar button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#richToolbar button:hover {
+  background: rgba(79, 70, 229, 0.14);
+  border-color: var(--border);
+}
+
+.toolbarDivider {
+  width: 1px;
+  height: 16px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
 #bodyInput {
   flex: 1 1 auto;
   min-height: 0;
-  resize: none;
+  overflow-y: auto;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px 12px;
@@ -99,6 +127,22 @@ main {
   background: transparent;
   color: var(--text);
   font-family: inherit;
+}
+
+#bodyInput:empty::before {
+  content: attr(data-placeholder);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+#bodyInput p {
+  margin: 0 0 0.8em;
+}
+
+#bodyInput ul,
+#bodyInput ol {
+  margin: 0 0 0.8em;
+  padding-left: 1.4em;
 }
 
 #titleInput:focus,

@@ -15,7 +15,20 @@
 
     <main>
       <input id="titleInput" type="text" placeholder="タイトル（省略可）" autocomplete="off" />
-      <textarea id="bodyInput" placeholder="今日のできごとを書く…"></textarea>
+      <div id="richToolbar">
+        <button type="button" data-cmd="bold" title="太字 (Ctrl+B)"><b>B</b></button>
+        <button type="button" data-cmd="italic" title="斜体 (Ctrl+I)"><i>I</i></button>
+        <span class="toolbarDivider"></span>
+        <button type="button" data-cmd="insertUnorderedList" title="箇条書き">☰ 箇条書き</button>
+        <button type="button" data-cmd="insertOrderedList" title="番号付きリスト">☰ 番号</button>
+      </div>
+      <div
+        id="bodyInput"
+        contenteditable="true"
+        data-placeholder="今日のできごとを書く…"
+        role="textbox"
+        aria-multiline="true"
+      ></div>
       <div id="actions">
         <span id="draftHint">下書きは自動保存されます</span>
         <button id="sendBtn">Journeyに送信</button>
