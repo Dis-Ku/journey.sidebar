@@ -44,8 +44,8 @@ Journeyは自身がiframe内に表示されていることをJavaScriptで検知
 3. 拡張機能アイコンを右クリック→「オプション」を開き、コピーしたURLを貼り付けて保存します。
 4. オプション画面の「テスト送信」を押すと、Zapier側の「Test trigger」でサンプルデータを
    受信できます。
-5. アクションに Journey アプリの **Create Journal Entry** を選び、受信した `title` / `text`
-   フィールドをJourney側の入力欄にマッピングします。
+5. アクションに Journey アプリの **Create Journal Entry** を選び、受信した `text`
+   フィールドをJourney側の「テキスト」欄にマッピングします。
 6. Zapを有効化（On）にします。
 
 以降、サイドパネルから「Journeyに送信」を押すと、そのZap経由でJourneyにエントリーが
@@ -53,17 +53,19 @@ Journeyは自身がiframe内に表示されていることをJavaScriptで検知
 
 ## 送信されるデータ
 
+[Journey公式のZapier用APIドキュメント](https://support.journey.cloud/ja/categories/web-services/articles/journey-api-documentation-for-zapier)
+に合わせて、送信するのは `text` フィールドのみです（タグ・位置情報・天気・感情などJourneyの
+他フィールドは今回は扱っていません）。
+
 ```json
-{
-  "title": "（タイトル。空の場合あり）",
-  "text": "本文（**太字**・*斜体*・- 箇条書き などMarkdown記法に変換したプレーンテキスト）",
-  "html": "<p>本文（そのままのHTML。<b>太字</b>など）</p>",
-  "created_at": "2026-09-11T09:00:00.000Z"
-}
+{ "text": "<html><h1>タイトル</h1>本文（<b>太字</b>や<ul><li>箇条書き</li></ul>など）</html>" }
 ```
 
-`text`と`html`は同じ内容の異なる表現です。JourneyのZapierアクションがプレーンテキストしか
-受け付けない場合は`text`を、HTMLを受け付けられる場合は`html`をマッピングしてください。
+- 書式（太字・斜体・箇条書き・番号付きリスト）を使った場合、Journeyが対応しているタグ
+  （`h1, b, strong, i, em, br, ul, ol, li`）のみを使い、全体を `<html>...</html>` で囲みます。
+- 書式を一切使わなかった場合は、そのままのプレーンテキストを送信します。
+- タイトル欄に入力した内容は、Journeyに独立したタイトル項目がないため `<h1>` として本文の
+  先頭に埋め込まれます。
 
 Zapier以外に送信されることはなく、拡張機能自身がJourneyのアカウント情報やCookieに
 アクセスすることもありません。

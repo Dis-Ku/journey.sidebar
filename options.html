@@ -36,18 +36,18 @@
         <li>このページで「テスト送信」を押し、Zapier側の「Test trigger」でデータを受信する。</li>
         <li>
           アクションに Journey アプリの「Create Journal Entry」を選び、受信した
-          <code>title</code> / <code>text</code> フィールドを対応する入力欄にマッピングする。
+          <code>text</code> フィールドをJourney側の「テキスト」欄にマッピングする。
         </li>
         <li>Zapを有効化（On）にする。</li>
       </ol>
       <p class="hint">
-        送信されるJSONのフィールドは <code>title</code>・<code>text</code>・<code>html</code>・
-        <code>created_at</code> です。<code>text</code>は太字・斜体・箇条書きをMarkdown記法
-        （<code>**太字**</code> / <code>*斜体*</code> / <code>- 箇条書き</code>）に変換したプレーン
-        テキスト、<code>html</code>はそのままのHTMLです。Journey側がプレーンテキストしか
-        受け付けない場合は<code>text</code>を、HTMLを受け付けられる場合は<code>html</code>を
-        マッピングしてください。Zap側の「Test trigger」画面で実際の受信データを見ながら
-        マッピングできます。
+        送信されるJSONのフィールドは <code>text</code> のみです（
+        <a href="https://support.journey.cloud/ja/categories/web-services/articles/journey-api-documentation-for-zapier" target="_blank" rel="noopener">Journey公式のZapier用APIドキュメント</a>
+        に準拠）。太字・斜体・箇条書き・番号付きリストを使った場合は、Journeyが対応している
+        タグ（<code>h1, b, strong, i, em, br, ul, ol, li</code>）だけを使い、全体を
+        <code>&lt;html&gt;...&lt;/html&gt;</code> で囲んだ文字列になります。書式を使わなかった
+        場合はそのままのプレーンテキストです。タイトル欄に入力した内容は <code>&lt;h1&gt;</code>
+        として本文の先頭に埋め込まれます（Journeyには独立したタイトル項目がないため）。
       </p>
     </main>
     <script src="common.js"></script>
