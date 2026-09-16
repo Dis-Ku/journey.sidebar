@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Journey Sidebar</title>
+    <link rel="stylesheet" href="sidepanel.css" />
+  </head>
+  <body>
+    <div id="toolbar">
+      <span id="dateLabel"></span>
+      <span class="spacer"></span>
+      <button id="settingsBtn" title="設定">⚙</button>
+    </div>
+
+    <main>
+      <input id="titleInput" type="text" placeholder="タイトル（省略可）" autocomplete="off" />
+      <div id="richToolbar">
+        <button type="button" data-cmd="bold" title="太字 (Ctrl+B)"><b>B</b></button>
+        <button type="button" data-cmd="italic" title="斜体 (Ctrl+I)"><i>I</i></button>
+        <span class="toolbarDivider"></span>
+        <button type="button" data-cmd="insertUnorderedList" title="箇条書き">☰ 箇条書き</button>
+        <button type="button" data-cmd="insertOrderedList" title="番号付きリスト">☰ 番号</button>
+      </div>
+      <div
+        id="bodyInput"
+        contenteditable="true"
+        data-placeholder="今日のできごとを書く…"
+        role="textbox"
+        aria-multiline="true"
+      ></div>
+      <div id="actions">
+        <button id="clearBtn" class="secondary" title="下書きを消去">下書きを消去</button>
+        <span class="spacer"></span>
+        <button id="sendBtn">Journeyに送信</button>
+      </div>
+      <p id="status" role="status"></p>
+    </main>
+
+    <script src="common.js"></script>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>
